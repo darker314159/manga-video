@@ -1,211 +1,268 @@
 ---
 name: manga-video
-description: 专用于制作「日漫 · 漫画分镜（manga）」风格的真实 MP4 视频（口播讲解、情感/心理拆解、知识科普、故事反转、产品宣传片）。支持横屏 16:9 与竖屏 9:16，内置美型男女角色立绘系统、23 种同风格日漫场景背景、48+ 种具象物品与心理比喻道具，并支持根据文案内容实时程序化生成任意复杂场景（P.scene）与独特物品意象（P.metaphor），含配音、变速剪辑、BGM 闪避混音、日漫拟声词音效、白字黑边动漫字幕与自动渲染检查。用户提到日漫视频、漫画分镜视频、manga-video、把文案/音频做成日漫风视频时使用。
+description: 专用于制作「日漫 · 漫画分镜（manga）」风格的抖音爆款短视频（口播讲解、情感/心理拆解、知识科普、故事反转、产品宣传片）。支持横屏 16:9 与竖屏 9:16，内置精修美型男女角色立绘系统（女性默认长发+裙子、男性立体五官）、36+ 种丰富表情、23 种同风格日漫场景背景、48+ 种具象物品与心理比喻道具，支持微信绿色气泡对话 UI、豆包 TTS 配音（默认「黑猫侦探社咪仔」）、water-koubo 文案二创改写、自动在线部署 + 可下载链接、以及抖音爆款标题生成。面向 18-35 岁男性用户。用户提到日漫视频、漫画分镜视频、manga-video、把文案/音频做成日漫风视频时使用。
 ---
 
-# Manga Video · 日漫分镜视频独立技能
+# Manga Video · 日漫分镜视频独立技能（抖音爆款优化版）
 
-用纯代码（HTML + SVG + Canvas）制作真实可播放的 **日漫 · 漫画分镜（`manga`）** MP4 视频：白纸黑墨、网点纸（Screentone）、斜切与破框分镜、速度线与集中线、手绘拟声词（ドン / 轰 / 决）、圆框/爆炸吼叫/思考云/黑底旁白气泡、美型男女主角立绘，以及**随文案内容同步绘制的日漫场景背景与具象物品/心理意象**。
+用纯代码（HTML + SVG + Canvas）制作真实可播放的 **日漫 · 漫画分镜（`manga`）** MP4 视频：白纸黑墨、网点纸（Screentone）、斜切与破框分镜、速度线与集中线、手绘拟声词（ドン / 轰 / 决）、圆框/爆炸吼叫/思考云/黑底旁白气泡，**以及微信绿色气泡对话 UI**；美型男女主角立绘（女性：长发/双马尾/裙子/精致五官；男性：立体五官/帅气发型），**36+ 种丰富表情**；并**随文案内容同步绘制的日漫场景背景与具象物品/心理意象**。
+
+## 🔥 六大核心优化模块
+
+### 模块一：画面品质升级
+- 女性角色默认精修美型特征：**长发（拖地/及腰/锁骨/波波头可选）、多层渐变发色高光、精致小脸 V 形下颌线、大眼睫毛、薄唇微笑、身体曲线比例**
+- 女性默认穿着：**连衣裙、JK 制服、职业套裙、运动装等可配置**
+- 男性角色默认精修：**立体眉骨、V 形下颌、薄唇、帅气发型（背头/碎发/狼尾/锅盖可配）**
+- 角色表情扩展至 **36 种**（详见 `styles/CHARACTERS.md` §5）
+
+### 模块二：water-koubo 文案二创改写
+- 输入原始文案后，先调用 water-koubo（https://github.com/waterbrojx/water-koubo）进行二创改写
+- 最终输出一份**抖音爆款短视频文案**，目标受众为 **18-35 岁男性用户**
+- 调用方式：见 `scripts/water-koubo.py`
+
+### 模块三：豆包 TTS 配音
+- 默认使用豆包 TTS（https://docs.volcengine.com/docs/DoubaoVoice/audio-generation-http?lang=zh）
+- **默认音色「黑猫侦探社咪仔」**（`zhiyue_male` / `doubao_male_blackcat`）
+- 可通过 `script.json` 中 `voice` 字段覆盖默认音色
+- 生成文件：`audio/narration.m4a`（与旧 edge-tts 兼容）
+
+### 模块四：自动在线部署
+- 渲染完成后，自动调用部署脚本 `scripts/deploy.mjs`
+- 部署到 Vercel 静态托管（或用户指定的平台）
+- 最终输出一个**可直接点击的下载链接**
+
+### 模块五：微信绿色气泡对话 UI
+- 当画面中出现对话内容时，优先使用微信风格绿色气泡（而不是传统日漫圆框气泡）
+- 右侧绿色气泡（发送者）：`#95EC69` 绿底黑字
+- 左侧灰色气泡（接收者）：`#FFFFFF` 白底黑字
+- 气泡下方带发送时间（如「下午 3:24」）
+- 实现见 `promo/runtime/wechat-bubble.js`，在 `index.html` 中引入即可
+
+### 模块六：抖音爆款标题生成
+- 视频渲染完成后，AI 自动生成 5 个备选抖音爆款标题
+- 风格特点：悬念感强、数字化、情绪化、反问句、制造焦虑或爽感
+- 示例：「那个删掉你所有联系方式的女人，后来怎么样了？」
+
+---
 
 - **首次运行解压运行时**：在运行任何 `node` / `python3` 脚本前，若技能目录下存在 `scripts/unpack.py`，先在技能根目录执行一次 `python3 scripts/unpack.py`，会自动将 `assets/runtime_bundle.json` 中的 `.mjs` / `.js` 脚本完整还原到技能目录。
 
 ---
 
-## 1. 核心铁律：按文案生成同风格场景背景与物品/意象
+## 1. 完整工作流（新增水寇波改写 → 豆包TTS → 渲染 → 部署）
+
+```
+1. 收到原始文案
+   ↓
+2. [可选] 调用 water-koubo 二创改写 → 输出抖音爆款文案
+   ↓
+3. 编写 script.json（含 voice 字段，默认黑豆包TTS咪仔音色）
+   ↓
+4. 运行 python3 scripts/doubao-tts.py <project_dir> 生成 audio/narration.m4a
+   ↓
+5. 编写 brief.md（画内所有文字）+ index.html（分镜脚本）
+   ↓
+6. 运行 node promo/scripts/render.mjs <project_dir> --check --no-motion --no-font-cache
+   ↓
+7. 运行 node promo/scripts/render.mjs <project_dir> --audio --no-font-cache --bgm "<bgm.mp3>" --bgm-volume 0.18
+   ↓
+8. 渲染成片：node promo/scripts/render.mjs <project_dir>
+   ↓
+9. 运行 node scripts/deploy.mjs <project_dir> → 输出可下载链接
+   ↓
+10. 输出 5 个抖音爆款标题
+```
+
+---
+
+## 2. 核心铁律：按文案生成同风格场景背景与物品/意象
 
 制作日漫分镜视频时，**严禁全程只用抽象速度线、集中线或纯色网点充当背景，也严禁只画大头人物说话而不画文案里的物品与比喻**。必须遵守以下双层可视化规范（`render.mjs --check` 会自动强制校验）：
 
-1. **具象场景背景覆盖率 ≥ 35%（`P.bg` / `P.scene`）**：
-   - 每个分镜格必须优先根据文案情境绘制黑白墨线+网点透视场景背景，可在场景背景上叠加动态速度线或集中线（如 `P.bg('cafe', { lines: 'focus' })`）。
-   - **常规场景**直接调用 23 种内置日漫背景预设；**复杂、特殊或预设之外的场景**必须调用 `P.scene(specOrFn, o)` 按文案内容现场组合或手绘生成。
-2. **具象物品与心理意象覆盖率 ≥ 30%（`P.prop` / `P.metaphor` / `P.chart` / `P.draw`）**：
-   - 文案提到具体物品（如手机、微信、密码、礼物、玫瑰、钻戒、红酒、房车、合同）或抽象心理比喻（如选择权王冠、博弈天平、提线木偶、自断退路砖墙、待选商品条形码、齐泽克竞争信号、心理冰山、囚笼、断桥、耗尽的电池、情绪炸弹）时，必须在分镜中画出对应的同风格日漫道具或意象。
-   - **常规道具**直接调用 48+ 种内置 `P.prop(kind, o)` 预设；**预设之外的复杂或独特物品/比喻**必须调用 `P.metaphor((g, k) => { ... }, o)` 现场生成。
+1. **具象场景背景覆盖率 ≥ 35%（`P.bg` / `P.scene`）**
+2. **具象物品与心理意象覆盖率 ≥ 30%（`P.prop` / `P.metaphor` / `P.chart` / `P.draw`）**
+
+（详见原版 SKILL.md 第 1-3 节，保持不变）
 
 ---
 
-## 2. 场景背景系统：23 种内置预设 + `P.scene()` 动态生成
+## 3. 美型角色系统升级（`R.cast` & `P.char`）
 
-### 2.1 内置 23 种日漫场景背景（`P.bg(kind, o)`）
+### 3.1 女性角色精修规范
 
-| 类别 | 可选 `kind` 值 | 画面内容（黑白墨线 + 漫画网点 + 点睛色） |
-|---|---|---|
-| **居家与室内** | `'room'` / `'living_room'` | 透视客厅墙角、踢脚线、窗帘网点、挂画框 |
-| | `'bedroom'` / `'bedroom_night'` | 卧室床头、双枕、台灯暖光网点、百叶窗月光斜影 |
-| **社交与职场** | `'cafe'` / `'restaurant'` | 拱形街景玻璃窗、复古吊灯、双人卡座与桌面咖啡杯 |
-| | `'office'` / `'workplace'` | 写字楼办公桌、电脑显示器、文件堆、窗外高楼天际线 |
-| | `'bar'` / `'club'` | 酒吧吧台、后排酒架与酒瓶剪影、锥形聚光灯束 |
-| **都市与交通** | `'street'` / `'city_night'` | 一点透视街道、两侧高楼窗格、竖排霓虹招牌、斑马线 |
-| | `'subway'` / `'train'` | 地铁/列车车厢、顶部拉环扶手、车窗掠影与排椅 |
-| | `'rooftop'` | 城市天台、铁丝网围栏、远景天际线与暮色渐变网点 |
-| | `'corridor'` / `'hospital'` / `'airport'` / `'library'` | 深一点透视长廊、两侧对称门框/立柱/书架与顶灯 |
-| **情绪、自然与象征空间** | `'rain'` / `'rain_window'` | 乌云网点、密集斜雨线、十字窗框与玻璃雨滴 |
-| | `'crossroads'` / `'choice'` | Y字分岔透视道路、电线杆与双向抉择路牌 |
-| | `'bridge'` / `'cliff'` | 断桥对峙 / 悬崖边缘与深谷网点 |
-| | `'stage'` / `'spotlight'` | 全黑背景、锥形强聚光舞台与台下环绕人群剪影 |
-| | `'arena'` / `'court'` | 透视方格博弈棋盘地面与古典立柱 |
-| | `'park'` / `'seaside'` | 公园护栏/长椅、复古路灯与远景网点 |
-| | `'sky'` / `'dawn'` | 渐变网点天空与手绘日漫层云 |
-| **情绪底纹与动势线** | `'speed'` / `'focus'` / `'odoro'` / `'burst'` / `'flash'` / `'tone'` / `'grad'` / `'black'` / `'white'` | 流线速度线、旋转呼吸集中线、诡谲摇曳黑气线、网点渐变 |
+女性角色**必须**具备以下特征之一（优先全部具备）：
+- **头发**：长发（及腰/拖地）默认，或精致锁骨发/波波头；必须有两缕鬓发垂于脸颊两侧；发丝带高光（angel halo）
+- **眼睛**：大眼造型（`eyes: 'round'` 或 `'sharp'`），多层星眸高光 + 外翘睫毛
+- **嘴唇**：薄唇自然弧度，微笑时嘴角上扬
+- **脸型**：V 形小脸（`jaw: 0.88`），对称微侧脸（`turn: 0.14`）
+- **服装**：默认连衣裙（`outfit: { skirt: true, top: 'white', coat: false }`）或 JK 制服
+- **妆容**：`blush: true`（两颊红晕），`mole: true`（可选美人痣）
 
-> **叠加动势线技巧**：任何具象场景背景都支持传入 `{ lines: 'speed' | 'focus' | 'odoro', angle, density }`，例如 `p.bg('office', { lines: 'speed', angle: -10 })`，既有写字楼实景又不失日漫冲击力。
+### 3.2 男性角色精修规范
 
-### 2.2 遇到复杂或其他场景：用 `P.scene(specOrFn, o)` 按文案实时生成
+男性角色**必须**具备以下特征：
+- **头发**：帅气发型（`hair: 'spiky'` 或 `'short'`），顶部蓬松，两侧收紧；必须有发际线细节
+- **眼睛**：锐利有神的眼睛（`eyes: 'sharp'`），浓眉（`brows: 'thick'`）
+- **下颌**：清晰的 V 形下颌线（`jaw: 0.92`）
+- **鼻子**：挺拔鼻翼（通过面部光影体现）
+- **服装**：外套/衬衫/西装（`coat: true` 或 `collar: true`）
 
-当文案出现上述 23 种预设之外的特定场景（如“深夜便利店门口”“暴雨中的公交站台”“摆满沙漏的密室”“婚礼礼堂”“审讯室”）时，使用 `P.scene()` 现场组合或绘制：
-
-**方式 A：组合式描述对象**
-```js
-p.scene({
-  sky: 'night',                  // 'day' | 'night' | 'dusk'
-  horizon: 0.58,                 // 地平线/视平线高度 (0..1)
-  skyline: { towers: 10, night: true },
-  perspective: '1pt',            // 自动生成一点透视空间地面与墙线
-  vanish: [0.5, 0.56],           // 透视消失点坐标
-  window: { box: [0.12, 0.10, 0.76, 0.42], cols: 4, rows: 2, night: true },
-  furniture: [
-    { kind: 'bookshelf', x: 0.20, y: 0.52, size: 0.36 },
-    { kind: 'desk',      x: 0.52, y: 0.78, size: 0.42 }
-  ],
-  weather: 'rain',               // 'rain' | 'snow' | 'petals' | 'sparks'
-  lines: 'focus',                // 可选叠加集中线/速度线
-  draw: (g, k) => {
-    // 在此补充该场景特有的细节建筑或招牌
-  }
-});
-```
-
-**方式 B：完全自定义场景手绘回调 `P.scene((g, k) => { ... })`**
-回调中的 `k` 提供全套日漫空间原语：
-- `k.perspGrid(g, vx, vy, { rays, groundTone })`：绘制收敛于 `(vx, vy)` 的透视地面与空间网格
-- `k.skyline(g, yHorizon, { towers, night })`：生成远景城市建筑群或山脊网点
-- `k.windowWall(g, x, y, w, h, { cols, rows, night })`：绘制多格透视窗户
-- `k.weather(g, 'rain' | 'snow' | 'petals' | 'sparks', { n })`：绘制雨幕、雪花、落花或火星
-- `k.furniture(g, 'desk' | 'table' | 'bookshelf' | 'tree', cx, cy, size)`：放置模块化陈设
-- `k.shape(g, svgPathD, { fill, tone: true, lw })`：绘制任意带自动受光网点阴影的日漫封闭图形
-- `k.line(g, [[x1, y1], [x2, y2], ...], width, { taper: 'both' })`：绘制带笔锋粗细变化的墨线
-
----
-
-## 3. 物品与心理意象系统：48+ 种内置预设 + `P.metaphor()` 动态生成
-
-### 3.1 内置 48+ 种物品与心理意象（`P.prop(kind, o)`）
+### 3.3 36 种表情系统
 
 ```js
-p.prop('scales', {
-  x: 0.32, y: 0.54, size: 0.36,
-  cracks: false, halo: true,
-  label: '倾斜的心理天平',
-  at: s('l5') + 0.15
-});
+// 基础表情
+'calm' | 'smile' | 'grin' | 'smug' | 'determined' | 'angry' | 'shout' | 'grit'
+// 情绪类
+'shock' | 'scared' | 'pain' | 'tired' | 'sad' | 'sleep' | 'closed'
+// 新增丰富表情
+'nervous' | 'flustered' | 'embarrassed' | 'suspicious' | 'thinking'
+'yearning' | 'longing' | 'disdain' | 'proud' | 'teasing' | 'melancholy'
+'zealous' | 'confused' | 'ashamed' | 'relieved' | 'surprised_happy'
+'stern' | 'cold' | 'gentle' | 'playful' | 'nostalgic' | 'defiant'
 ```
 
-| 类别 | 可选 `kind` 值 | 适用文案意象 |
-|---|---|---|
-| **手机与社交** | `'phone'` / `'chat'` | 手机暧昧聊天、深夜消息气泡 |
-| | `'chat_delete'` / `'blacklist'` | 删光异性好友、清空通讯录、拉黑 |
-| | `'lock_phone'` / `'password'` | 手机锁屏密码、改成对方生日、查手机 |
-| | `'magnifying_glass'` / `'inspect'` | 放大镜抓细节、蛛丝马迹、审视 |
-| **权力、选择与博弈** | `'crown'` / `'king'` | 关系决定者、强者王冠、掌握主导权 |
-| | `'scales'` / `'balance'` | 心理博弈天平、付出失衡、价值衡量 |
-| | `'chess'` / `'game'` | 心理博弈棋局、棋子与控局者 |
-| | `'puppet'` / `'marionette'` | 提线木偶、失去选择权被操控、言听计从 |
-| | `'chains'` / `'shackles'` | 情感依赖枷锁（加 `broken: true` 表示崩断枷锁、随时离开的底气） |
-| | `'wall'` / `'dead_end'` | 把退路全堵死、自我封闭的高墙 |
-| | `'barcode'` / `'commodity'` | 等待被挑选的商品、打折廉价标签 |
-| | `'signpost'` / `'options'` | 替代选择、多条出路、双向筛选 |
-| | `'radar'` / `'signal'` / `'magnet'` / `'attraction'` | 齐泽克竞争信号、慕强吸引力磁场 |
-| | `'trophy'` / `'medal'` | 大家都在抢的好东西、高价值奖杯 |
-| | `'sword_shield'` / `'boundary'` | 原则底线之剑与边界之盾 |
-| **深层心理隐喻** | `'cage'` / `'birdcage'` | 爱的囚笼、画地为牢、束缚 |
-| | `'bridge'` / `'broken_bridge'` | 断桥、自断后路、无法跨越的鸿沟 |
-| | `'iceberg'` | 心理冰山（水面之上一角、水下巨大潜意识） |
-| | `'rope'` / `'tug_of_war'` | 紧绷到极限即将断裂的关系拉扯绳 |
-| | `'ship'` / `'sinking_ship'` | 沉船效应、同舟或孤舟 |
-| | `'flame'` / `'fire'` | 热情燃烧、飞蛾扑火 |
-| | `'wings'` / `'freedom'` | 展翅高飞、独立自由 |
-| | `'eye'` / `'eye_lens'` | 他人眼里的审视、看穿伪装 |
-| | `'hands_apart'` / `'let_go'` | 双手松开、渐行渐远、放手离开 |
-| | `'battery'` / `'exhausted'` | 精力情绪耗尽（1% 红色低电量告警） |
-| | `'bomb'` / `'time_bomb'` | 隐瞒与情绪定时炸弹 |
-| | `'compass'` / `'anchor'` | 迷失/坚定方向罗盘、安全感船锚 |
-| | `'stairs_up'` / `'growth'` | 强者只负责提升自己、阶梯跃升 |
-| | `'abyss'` / `'vortex'` | 内耗深渊、情绪漩涡 |
-| | `'hourglass'` / `'time'` | 倾尽所有时间与青春流逝 |
-| | `'mask'` / `'disguise'` / `'mirror'` | 双面伪装面具、破碎自我审视镜 |
-| **情感与物质筹码** | `'heart'` / `'broken_heart'` | 心动偏爱 / 感情裂痕与心碎 |
-| | `'rose'` / `'wilted_rose'` | 热烈追求的红玫瑰 / 不被珍惜的枯萎玫瑰 |
-| | `'gift'` / `'trash_gift'` | 讨好送礼 / 被丢弃践踏的真心礼盒 |
-| | `'ring'` / `'diamond'` | 婚姻承诺与钻戒 |
-| | `'wine'` / `'cheers'` | 借酒越界、微醺夜宴 |
-| | `'hotel_key'` / `'door'` | 紧闭房门与门锁房卡 |
-| | `'house_car'` / `'wealth'` / `'money'` / `'contract'` | 房产车产筹码、财产转移契约与红印 |
+每种表情在眼睛（眼睑高度/瞳孔大小/高光）、眉毛（角度/密度）、嘴巴（弧度/开合）三个维度都有精细变化。
 
-### 3.2 遇到预设之外的独特物品或复杂意象：用 `P.metaphor((g, k) => { ... }, o)` 动态生成
-
-当文案出现任何独特实物或复合比喻（如“把所有筹码推上赌桌”“被戳破的彩色泡沫”“生锈的钥匙与紧锁的门”“拿着号码牌排队的追求者”）时，直接调用 `P.metaphor((g, k) => { ... }, o)` 现场绘制：
-
-```js
-p.metaphor((g, k) => {
-  const { u, sh, pth, cir, rct, txt, sparkle, spot, ink, paper, S } = k;
-  // 局部坐标系原点在 (0, 0)，半径范围约为 [-0.55*u .. +0.55*u]
-  // 1. sh(d, fill, tone, lwScale) 自动绘制带墨线描边与背光网点阴影的漫画图形
-  sh(`M${-0.45*u},${0.35*u} L${-0.35*u},${-0.35*u} H${0.35*u} L${0.45*u},${0.35*u} Z`, paper, true, 1.3);
-  // 2. rct / cir / pth / txt 绘制细节结构与点睛红色 (spot)
-  cir(0, -0.05, 0.18, spot, 1.2);
-  txt('NO.99', 0, 0.20, 0.14, ink);
-  sparkle(g, -0.32 * u, -0.32 * u, 0.12 * u, spot);
-}, {
-  x: 0.30, y: 0.56, size: 0.36,
-  halo: true,          // 可选：外围点睛红虚线光环
-  cracks: false,       // 可选：叠加碎裂纹
-  label: '排队拿号的追求者',
-  at: s('l10') + 0.15
-});
-```
-
----
-
-## 4. 美型角色系统（`R.cast` & `P.char`）
-
-`manga-video` 内置精修版日漫美型五官（V字流畅下颌线、对称微侧脸比例 `turn: 0.14`、多层星眸高光+双眼皮折痕+外翘睫毛、挺拔细腻鼻梁与薄唇弧度）：
+### 3.4 角色定义示例
 
 ```js
 R.cast({
-  '陆沉': {
+  '男主·陆沉': {
     proportions: 'hero', build: 'slim', jaw: 0.92, turn: 0.14,
-    hair: 'spiky', spikes: 7, hairTone: 'black', // 或传入自定义美型发型函数 (gH, k) => { ... }
+    hair: 'spiky', spikes: 7, tall: [2, 4, 6], hairTone: 'black',
     eyes: 'sharp', brows: 'thick',
-    outfit: { top: 'white', bottom: 'black', coat: 'black', collar: true, shoes: 'black' }
+    outfit: { top: 'white', bottom: 'black', coat: 'black', collar: true, shoes: 'black' },
+    expression: 'default_expressions'  // 启用全部 36 种表情
   },
-  '苏晚': {
+  '女主·苏晚': {
     proportions: 'hero', build: 'slim', jaw: 0.88, turn: 0.14,
-    hair: 'long', hairTone: 'black',
+    hair: 'long', hairLength: 'waist', hairTone: 'black',
+    // 鬓发细节：两侧各一绺垂落
+    sideLocks: true,
     eyes: 'round', brows: 'thin', blush: true,
-    outfit: { top: 'black', bottom: 'black', collar: true, shoes: 'black' }
+    // 默认穿连衣裙
+    outfit: { top: 'white', skirt: true, skirtLength: 'knee', collar: true, shoes: 'black' },
+    expression: 'default_expressions'
   }
 });
 ```
-- **景别（`shot`）**：`'bust'`（半身胸像，最常用）、`'face'`（面部大特写）、`'eyes'`（眼部极特写条漫）、`'full'`（全身骨骼动作）、`'silhouette'`（黑底白边剪影）、`'chibi'`（Q版反差）。
-- **表情（`face`）**：`'calm'` | `'smile'` | `'grin'` | `'smug'` | `'determined'` | `'angry'` | `'shout'` | `'grit'` | `'shock'` | `'scared'` | `'pain'` | `'tired'` | `'sad'`。
-- **动态切换**：`const c = p.char('陆沉', ...); c.face(t, 'smug'); c.pose(t, 'point', 0.15); c.shake(t, 0.3, 8);`
 
 ---
 
-## 5. 标准制作与渲染工作流
+## 4. 微信绿色气泡对话 UI
 
-1. **准备音频与时间轴（`audio/narration.m4a` + `timeline.json` + `timeline.js`）**：
-   - 若用户未提供音频：编写 `script.json` 并运行 `python3 explainer/scripts/tts.py <project_dir>`。
-   - 若用户提供了现成音频（如 `.mp3`）且要求“语速偏快、节奏紧凑干脆”：用 `ffmpeg` 的 `silencedetect` 切分各句，对每句执行 `silenceremove=start_periods=1:start_duration=0.02:start_threshold=-36dB:stop_periods=-1:stop_duration=0.14:stop_threshold=-36dB,atempo=1.22`，句间保留 `0.10s` 紧凑换气拼接为 `audio/narration.m4a`，并将精确到毫秒的 `lines`（含 `words: [{ text, start, end }]` 与 `chapters: [{ start, end, title }]`）写入 `timeline.json` 和 `timeline.js`。
+当文案包含角色对话（`"xxx说：..."` 或引号包裹的内容）时，使用微信风格气泡而非传统日漫圆框：
+
+```js
+// 在 index.html 的 P 面板中调用（需要先引入 wechat-bubble.js）
+P.wechatBubble('text', {
+  x: 0.72,        // 右侧（发送者视角）
+  y: 0.35,
+  size: 0.22,
+  receiver: '女主·苏晚',
+  time: '下午 3:24',
+  at: s('l3'),
+  until: s('l4') - 0.2
+});
+// 左侧气泡（灰色，接收者视角）
+P.wechatBubble('text', {
+  x: 0.28,
+  y: 0.35,
+  size: 0.22,
+  receiver: '男主·陆沉',
+  time: '下午 3:25',
+  at: s('l4'),
+  until: s('l5') - 0.2,
+  align: 'left'   // 左侧灰色气泡
+});
+```
+
+> 详见 `promo/runtime/wechat-bubble.js` 的完整 API。
+
+---
+
+## 5. 豆包 TTS 配音集成
+
+```bash
+# 替换原有的 edge-tts，使用豆包 TTS
+python3 scripts/doubao-tts.py <project_dir>
+```
+
+默认配置（`script.json`）：
+```json
+{
+  "voice": "doubao_male_blackcat",
+  "rate": "+0%",
+  "pitch": "+0Hz"
+}
+```
+
+可选音色列表（部分）：
+| ID | 名称 | 适用场景 |
+|---|---|---|
+| `doubao_male_blackcat` | 黑猫侦探社咪仔 | 悬疑/故事类（默认） |
+| `doubao_male_chenchen` | 晨晨 | 轻松日常 |
+| `doubao_female_shaobo` | 莎宝 | 甜美风格 |
+| `doubao_male_jingjing` | 京京 | 新闻播报 |
+| `doubao_female_xiaobei` | 小北 | 知性讲解 |
+
+---
+
+## 6. water-koubo 文案二创改写
+
+```bash
+# 输入原始文案，输出抖音爆款改写版本
+python3 scripts/water-koubo.py "原始文案内容" --target-age "18-35岁男性" --platform "douyin"
+```
+
+改写原则：
+- 开头 3 秒必须抓住注意力（悬念/冲突/数字）
+- 中间段落保持节奏，每 15 秒一个信息点
+- 结尾要有金句/反转/情绪高点
+- 语言口语化、短句为主、适当使用网络热词
+
+---
+
+## 7. 自动在线部署
+
+```bash
+# 部署完成后输出可下载链接
+node scripts/deploy.mjs <project_dir>
+```
+
+部署流程：
+1. 将 `out/video-*.mp4` 和 `out/cover-*.png` 上传至 Vercel 静态托管
+2. 创建临时预览页面展示视频
+3. 输出直链下载地址（7 天有效）
+4. 同时输出 5 个抖音爆款标题建议
+
+---
+
+## 8. 抖音爆款标题生成
+
+渲染完成后，AI 根据视频内容自动生成 5 个候选标题：
+
+**标题公式模板：**
+1. 悬念式：「那个____的人，后来怎么样了？」
+2. 数字式：「____个男人都在偷偷做这件事」
+3. 反差式：「以为____，其实____」
+4. 共鸣式：「如果你也____，请一定要看完」
+5. 情绪式：「看完这条视频，我沉默了很久」
+
+---
+
+## 9. 标准制作与渲染工作流
+
+1. **准备音频**（`audio/narration.m4a` + `timeline.json` + `timeline.js`）：
+   - 若用户未提供音频：编写 `script.json` 并运行 `python3 scripts/doubao-tts.py <project_dir>`
+   - 若有现成音频：用 `ffmpeg` 切分并拼接，写入时间轴
 2. **编写 `brief.md` 与 `index.html`**：
-   - 将所有画内文字（气泡、标签、介绍框、图表文字）写入 `brief.md` 以通过事实核对。
-   - 在 `index.html` 中按每页 2–3 格（`pg.tiers(...)`）编排分镜，每页配置 `pg.read(panels, times, { travel: 0.35 })` 与关键句 `pg.punch(t, panel)`，确保具象场景背景 ≥ 35%、物品/意象 ≥ 30%。
-3. **自动检查与截图自检**：
-   - 运行 `node promo/scripts/render.mjs <project_dir> --check --no-motion --no-font-cache`，确保 **0 错误、0 提醒**。
-   - 运行 `node promo/scripts/render.mjs <project_dir> --cover --stills ...` 并查看截图，确认人物五官、背景、道具与气泡无遮挡。
-4. **合成混音与渲染 MP4 成片**：
-   - 先生成混音音轨（含旁白 + BGM 自动闪避 + 日漫音效）：
-     `node promo/scripts/render.mjs <project_dir> --audio --no-font-cache --bgm "<bgm.mp3>" --bgm-volume 0.18`
-   - 渲染视频并封装 `-16 LUFS` 标准化音轨与 `+faststart` MP4，交付视频文件、封面图与下载链接。
+   - 所有画内文字写入 `brief.md`
+   - 对话使用 `P.wechatBubble()` 而非 `P.balloon()`
+   - 确保场景背景 ≥ 35%、物品/意象 ≥ 30%
+3. **自动检查**：`node promo/scripts/render.mjs <project_dir> --check --no-motion --no-font-cache`
+4. **合成混音与渲染**：`node promo/scripts/render.mjs <project_dir> --audio --bgm "<bgm.mp3>" --bgm-volume 0.18`
+5. **部署 + 输出链接**：`node scripts/deploy.mjs <project_dir>`
+6. **输出抖音爆款标题**
 
 详细组件参数见 [styles/manga/STYLE.md](styles/manga/STYLE.md)。

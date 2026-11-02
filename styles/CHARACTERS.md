@@ -1,75 +1,241 @@
-# Characters in a story (all styles)
+# Manga Characters · 美型角色规范（抖音爆款优化版）
 
-Rules for any video where named people act out a story: history, allusions, a founder's story, a dialogue. They hold in every style that has characters; each style draws them its own way (table at the end).
+本文件描述 manga 风格中所有可命名角色的**设计规范、视觉特征与表情系统**。
+原则：**角色靠轮廓和 1–2 个标志性特征辨认，不靠五官细节堆砌**。
 
-## The four rules
+---
 
-1. **Fix the cast at the start.** Every named character is defined once (`window.CAST` in `characters.js` for whiteboard / ink; `Y.cast({ … })` for shadow; `X.cast({ … })` for pixel; `C.cast({ … })` for chat) and every scene calls them **by name**. The same person looks the same in every scene. Never redraw someone from scratch in a later scene.
-2. **People in the same scene differ in at least two visible attributes.** Choose from:
-   - face (painted colour, shape);
-   - hair / beard (beard colour for age);
-   - headwear;
-   - clothes colour;
-   - build (fat / thin, tall / short).
+## 1. 核心铁律：双人场景视觉区分
 
-   Opera face conventions help the audience:
+同一场景中两个角色必须在 **至少两个视觉属性** 上区分：
+- 脸型（轮廓）
+- 发型/发色
+- 头饰
+- 服装颜色
+- 体型（高/矮、瘦/壮）
 
-   | Look | Reads as |
-   |---|---|
-   | Red face | Loyal and brave |
-   | White face | Treacherous |
-   | Black face | Rough and blunt |
-   | No beard | Young |
-   | White beard | Old |
+否则 `--check` 会报警。
 
-   The renderer checks the cast: two characters that differ in fewer than two attributes get a warning in `--check` (`EV.castCheck`, core).
-3. **Two-person moments are staged face to face.** Talking, arguing, fighting, bowing: the two face each other (`faceTo`). Only the one speaking moves their mouth or arms; the other reacts. A fight is two people facing each other and moving at the same time, not one person waving alone.
-4. **A chain of events is staged as a relay.** "A was killed by B, B by C, C by D": the next person walks up to the previous one, they act it out face to face, and the loser leaves the light (falls and sinks / exits). Their name tag turns into the year or the result. The audience sees the chain instead of four people standing in a row.
+---
 
-Also:
+## 2. 女性角色精修规范（重点）
 
-- **Name tags.** The first time someone appears, hang their name over them:
-  - shadow: `Y.placard({ over: puppet })`;
-  - whiteboard: a name in the character's accent colour;
-  - ink: a short calligraphy line beside the figure (`b.write`), or the ink-bloom (墨晕) blot / a seal for the key person.
+### 2.1 默认特征：长头发 + 裙子
 
-  In a crowded scene, keep the names on.
-- **Keep scenes small.** Two or three people with names at once; extras (soldiers, crowds) can repeat one look and need no name.
-- **Check before rendering.**
-  - Whiteboard / ink: `node explainer/scripts/cast.mjs <project>` renders the cast lineup (`review/cast.png`). Look at it once: can you tell everyone apart at phone size?
-  - Shadow: render a still of a scene with the whole cast.
+所有女性角色**默认**带以下特征，除非明确覆盖：
+- **长发**：至少及肩（`hairLength: 'shoulder'`），推荐及腰（`'waist'`）或拖地（`'floor'`）
+- **鬓发**：两侧各一绺垂落脸颊（`sideLocks: true`）
+- **裙子**：默认连衣裙或 JK 制服裙（`skirt: true`）
+- **红晕**：两颊浅红（`blush: true`）
+- **睫毛**：外翘双层睫毛
 
-## What each style has
+### 2.2 发型规格
 
-| Style | Characters | Call by name | Face someone | Fight / fall | Cast check |
-|---|---|---|---|---|---|
-| `whiteboard` | Busts (`b.character`, `explainer/references/characters.md`) | `b.character('Name', …)` | `faceTo: other` when created (busts don't turn later); `flip` | point with a prop (sword), `say`, expressions; no fall | yes |
-| `ink` | Full figures (`b.figure`, `styles/ink/STYLE.md` §11) | `b.figure('Name', …)` | `faceTo: other` when created, `.faceTo(at, other)` / `.turn(at)` later | `pose` point / bow / run / gongshou, `move`; no fall | yes |
-| `shadow` | Jointed puppets (`Y.puppet`, `styles/shadow/STYLE.md`) | `Y.puppet(…, { who: 'Name' })` | `faceTo: other` when created, `P.faceTo(at, other)` | `fight` (lunges forward), `fall`, `sink`, `bow`, `talk`, `ride` | yes (also warns for twins in one scene) |
-| `pixel` | Sprite characters (`X.char`, `styles/pixel/STYLE.md` §8) | `X.cast({ … })` + `X.char(…, { who: 'Name' })` | `faceTo: other` when created, `h.faceTo(at, other)` | `attack` (the other is hit and knocked back), `hurt`, `ko`, `jump`, `say`, `emote`, `cheer` | yes (also warns for twins in one scene) |
-| `chat` | Code-drawn portrait avatars (Tang or modern: headwear, hair, beard, robe, age) and names in a messaging app (`C.cast`, `styles/chat/STYLE.md` §8) | `C.cast({ … })` + `T.msg(at, 'Name', …)` | a back-and-forth of messages left / right; `quote` to answer someone | — (a dialogue, not a fight: recall, reactions, "X joined") | yes |
-| `manga` | Code-drawn manga characters on a jointed rig (`P.char`, `styles/manga/STYLE.md` §10): full figure, bust, face, eye close-up, chibi, silhouette | `R.cast({ … })` + `P.char('Name', …)` | `faceTo: other` / `facing` when placed; two panels side by side facing each other (VS) | `punch` / `dash` / `fall` poses, `P.fist`, `C.hit` (knocked back), shake and flash on the hit | yes |
-| `lumen` | One minimal original protagonist on a front-view rig, lit by the scene's light (`S.actor`, `styles/lumen/STYLE.md` §9): expressions (eyes, brows, cowlick), poses in bed / at a desk / at a window, acts (scroll, walk, jolt, sigh…) | `L.cast({ … })` + `S.actor('Name', …)` | `turn` ±0.6 or `flip` toward the other | `jolt`, `tremble`, `slump`, being dragged up (`move` from lying to sitting); no fight | yes |
-| `cutout` | Anonymous paper figures (`C.figure`) — "users", "the community" | — | — | — | — |
-| `grain` | Anonymous flat figures (`G.figure`: round head, block body, stick limbs; stand / walk / sit / point / work / read …) — roles like "a worker", "a reader" | — | `face: 'left' \| 'right'` | — | — |
-| `storybook` | The project's own cast of original cute characters on one rig (`B.char`, `styles/storybook/STYLE.md` §10): bean / round / blob / gem / star / capsule / pillar bodies, a sprout / antenna / cap / cilia on top, a letter badge, dot or ^ ^ eyes, blush; acts (hop, jump, squash, cheer, point, chomp, shiver…), clones (`B.split` / `B.merge`). Creatures and objects only — never people, never another brand's mascot | `B.cast({ … })` + `B.char('Name', …)` | `c.look(at, ±1)` toward the other; walking turns the gaze | `shake`, `shiver`, `ko` face; one swallowing another (`B.merge`); no fight | yes |
-| `tapestry` | Flat side-on Bayeux figures on one rig (`B.figure`, `styles/tapestry/STYLE.md` §10): tunic or robe, cloak, cross-gartered hose, hair / beard / headwear (cap, helmet, crown, hood, veil, tall hat, brim); poses (point, raise, present, hold, carry, read…) and working loops (write, work, pull, carve, pound); historical people are generic figures named by the caption, never a likeness | `B.cast({ … })` + `B.figure('Name', …)` | `face: 'left'` when created, `c.turn(at)` later | big gestures (`c.pose`), `c.nod`, `c.go` (walking); no fall | yes |
-| `pop`, `riso`, `origami`, `op`, `ascii`, `launch`, `bauhaus`, `swiss`, `blueprint`, `collage` | No characters | — | — | — | — |
+```js
+// 女性发型参考
+{
+  hair: 'long',
+  hairLength: 'waist',     // 'shoulder' | 'waist' | 'floor' | 'bob' | 'ponytail'
+  hairTone: 'black',        // 'black' | 'brown' | 'blonde' | 'white' | 任意颜色
+  sideLocks: true,          // 两侧鬓发（默认开启）
+  bangs: 'soft',            // 'soft' | 'straight' | 'side' | 'none'
+  hairAccessories: ['ribbon'], // 发饰：'ribbon' | 'flower' | 'clip' | 'band'
+}
+```
 
-**When the content is a story with named people**, recommend a style that has characters:
+### 2.3 服装规格
 
-| Style | Suits |
-|---|---|
-| shadow | Chinese history and legends, conflict |
-| ink | Classical, poetic, calm stories |
-| whiteboard | Anything, with explanation in between |
-| pixel | Light stories, founders and teams, "user meets a problem", tech and gaming history, kids |
-| chat | Stories carried by dialogue and quotes (allusions, "who said what"), anything with many sources |
-| lumen | One person's inner struggle told to "you" (habits, self-improvement); a second person only as a small part |
-| manga | Contests and showdowns (a science idea told as a fight), stories with a twist, young audiences |
-| tapestry | Chronicles: a history in many steps, each step people at work (inventors, makers, voyages, the history of a craft) |
+```js
+// 女性服装参考
+{
+  outfit: {
+    top: 'white',                    // 上衣颜色
+    skirt: true,                     // 有裙子（默认）
+    skirtLength: 'knee',             // 'mini' | 'knee' | 'ankle' | 'floor'
+    skirtType: 'pleated',            // 'plain' | 'pleated' | 'flared'
+    collar: true,                    // 有领子
+    shoes: 'black',                  // 'black' | 'white' | 'brown'
+    accessories: ['bag'],            // 配件：'bag' | 'gloves' | 'scarf'
+  }
+}
+```
 
-In a style without characters, tell the story with the style's own devices and keep the rules in spirit:
-- **pop**: a dialogue is two speech bubbles from opposite sides of the panel, each with the speaker's name, alternating.
-- **launch / riso / origami / op / ascii / bauhaus / swiss / blueprint / collage**: one name card per person, always in the same colour and position; a confrontation is two cards facing each other (the style's `versus`).
-- Say in the storyboard that the style has no characters.
+### 2.4 面部精修
+
+```js
+{
+  jaw: 0.88,           // V 形小脸（0.8~0.95）
+  turn: 0.14,          // 微侧脸比例
+  blush: true,         // 两颊红晕
+  mole: false,         // 美人痣（可选）
+  eyes: 'round',       // 'round'(大眼) | 'sharp'(锐利) | 'sleepy'(慵懒)
+  brows: 'thin',       // 纤细眉
+}
+```
+
+### 2.5 女性角色示例
+
+```js
+// 清纯校园风
+R.cast({
+  '林小晚': {
+    proportions: 'hero', build: 'slim', jaw: 0.86, turn: 0.12,
+    hair: 'long', hairLength: 'waist', hairTone: 'black',
+    sideLocks: true, bangs: 'soft', hairAccessories: ['ribbon'],
+    eyes: 'round', brows: 'thin', blush: true,
+    outfit: { top: 'white', skirt: true, skirtLength: 'knee', skirtType: 'pleated', collar: true, shoes: 'black' },
+    expression: 'default_expressions'
+  }
+});
+
+// 冷艳职场风
+R.cast({
+  '沈清秋': {
+    proportions: 'hero', build: 'slim', jaw: 0.88, turn: 0.14,
+    hair: 'long', hairLength: 'floor', hairTone: 'black',
+    sideLocks: true, bangs: 'side',
+    eyes: 'sharp', brows: 'thin', blush: false,
+    outfit: { top: 'white', skirt: true, skirtLength: 'ankle', skirtType: 'flared', collar: true, coat: 'black', shoes: 'black' },
+    expression: 'default_expressions'
+  }
+});
+```
+
+---
+
+## 3. 男性角色精修规范
+
+### 3.1 默认特征：立体五官 + 帅气发型
+
+- **发型**：顶部蓬松，两侧收紧；背头/碎发/狼尾可选
+- **眉眼**：浓眉、锐利有神的眼型
+- **下颌**：清晰的 V 形轮廓
+- **服装**：外套/衬衫/西装风格
+
+### 3.2 发型规格
+
+```js
+// 男性发型参考
+{
+  hair: 'spiky',           // 'spiky' | 'short' | 'slick' | 'wolf'
+  spikes: 7,               // 尖刺数量（spiky 风格）
+  tall: [2, 4, 6],         // 最高尖刺的索引
+  hairTone: 'black',
+  hairVolume: 1.1,         // 发量（1.0 = 默认）
+}
+```
+
+### 3.3 面部精修
+
+```js
+{
+  jaw: 0.92,           // 方正 V 形下颌（比女性更明显）
+  turn: 0.14,          // 微侧脸
+  eyes: 'sharp',       // 锐利眼型
+  brows: 'thick',      // 浓眉
+  noseBridge: true,    // 鼻梁高光（通过光影体现挺拔）
+}
+```
+
+### 3.4 男性角色示例
+
+```js
+// 冷峻精英风
+R.cast({
+  '陆沉': {
+    proportions: 'hero', build: 'slim', jaw: 0.92, turn: 0.14,
+    hair: 'spiky', spikes: 7, tall: [2, 4, 6], hairTone: 'black', hairVolume: 1.1,
+    eyes: 'sharp', brows: 'thick', noseBridge: true,
+    outfit: { top: 'white', bottom: 'black', coat: 'black', collar: true, shoes: 'black' },
+    expression: 'default_expressions'
+  }
+});
+
+// 阳光运动风
+R.cast({
+  '周阳': {
+    proportions: 'hero', build: 'normal', jaw: 0.90, turn: 0.12,
+    hair: 'short', hairTone: 'brown', hairVolume: 1.0,
+    eyes: 'round', brows: 'normal',
+    outfit: { top: 'white', bottom: 'grey', coat: false, collar: false, shoes: 'white' },
+    expression: 'default_expressions'
+  }
+});
+```
+
+---
+
+## 4. 36 种表情系统
+
+每种表情在 **眼睑高度**、**瞳孔大小**、**眉毛角度**、**嘴角弧度** 四个维度精确控制：
+
+| 分类 | 表情 ID | 特征描述 |
+|---|---|---|
+| 基础 | `'calm'` | 平静，自然眼神，微闭嘴 |
+| | `'smile'` | 微笑，眼睛弯成月牙，嘴角上扬 |
+| | `'grin'` | 咧嘴笑，露齿，眼睛眯起 |
+| | `'smug'` | 得意/自信，单边嘴角上扬，半眯眼 |
+| | `'determined'` | 坚定，眉头微蹙，嘴唇紧闭成直线 |
+| 情绪爆发 | `'angry'` | 愤怒，眉毛倒竖，眼睛瞪大，牙关紧咬 |
+| | `'shout'` | 大喊，嘴巴大张，眉毛高挑 |
+| | `'grit'` | 咬牙，嘴唇压成细线，眼眶用力 |
+| 震惊恐惧 | `'shock'` | 震惊，眼睛极大，瞳孔缩小，嘴巴微张 |
+| | `'scared'` | 恐惧，眼睛睁大含泪光，眉毛上扬内倾 |
+| | `'pain'` | 痛苦，眼睛紧闭，眉头紧锁，嘴部扭曲 |
+| 疲惫消极 | `'tired'` | 疲惫，眼袋，半闭眼，嘴角下垂 |
+| | `'sad'` | 悲伤，眼角下垂，眼泪，嘴唇颤抖 |
+| | `'sleep'` | 睡觉，眼睛闭合，嘴角放松 |
+| | `'closed'` | 闭眼（用于思考/感受） |
+| 新增丰富表情 | `'nervous'` | 紧张，眼神飘忽，额头冒汗点 |
+| | `'flustered'` | 慌乱，眼睛睁大混乱，眉毛纠结 |
+| | `'embarrassed'` | 害羞，脸红加重，眼神躲闪，嘴角微抿 |
+| | `'suspicious'` | 怀疑，单眉上扬，眼神斜视 |
+| | `'thinking'` | 思考，眼神向上，手托下巴 |
+| | `'yearning'` | 渴望/憧憬，眼神发光，嘴角微扬 |
+| | `'longing'` | 思念，眼神温柔带泪光 |
+| | `'disdain'` | 不屑，单眼微眯，嘴角下撇 |
+| | `'proud'` | 骄傲，下巴微抬，眼神自信 |
+| | `'teasing'` | 调侃，单眉挑，狡黠笑 |
+| | `'melancholy'` | 忧郁，眼神低垂，淡淡的忧伤 |
+| | `'zealous'` | 狂热，眼睛放光，嘴角咧开 |
+| | `'confused'` | 困惑，眉毛纠结，眼神迷茫 |
+| | `'ashamed'` | 羞愧，低头，脸红，不敢看人 |
+| | `'relieved'` | 释然，肩膀放松，眼神柔和 |
+| | `'surprised_happy'` | 惊喜，眼睛亮，嘴巴张成 O 型 |
+| | `'stern'` | 严肃，眉毛压低，嘴唇紧抿 |
+| | `'cold'` | 冷漠，眼神平淡无波，嘴角平直 |
+| | `'gentle'` | 温柔，眼神柔和，浅浅微笑 |
+| | `'playful'` | 调皮，眨眼，歪头笑 |
+| | `'nostalgic'` | 怀旧，眼神远方，淡淡微笑 |
+| | `'defiant'` | 反抗，下巴抬起，眼神强硬 |
+
+### 4.1 表情动态切换
+
+```js
+const c = p.char('苏晚', { shot: 'bust', x: 0.5, y: 0.7, size: 0.8 });
+c.face(t, 'shock');          // t 时刻切换到震惊
+c.face(t + 0.5, 'sad');      // 0.5s 后变成悲伤
+c.pose(t, 'point', 0.15);    // 同时做指动作
+c.shake(t, 0.3, 8);          // 身体微抖（震惊状态）
+```
+
+---
+
+## 5. 景别系统
+
+| 景别 | shot 值 | 适用场景 |
+|---|---|---|
+| 全身骨骼动作 | `'full'` | 登场、战斗、走路 |
+| 半身胸像（最常用） | `'bust'` | 对话、旁白、心理描写 |
+| 面部大特写 | `'face'` | 情绪爆发、关键台词 |
+| 眼部极特写条漫 | `'eyes'` | 震惊、心动、决意 |
+| 黑底白边剪影 | `'silhouette'` | 神秘登场、悬念营造 |
+| Q 版反差 | `'chibi'` | 搞笑反应、吐槽 |
+
+---
+
+## 6. 角色检查规则
+
+- 同一场景中两个角色必须在 **至少两个属性** 上有差异（发型/发色、脸型、服装颜色、体型等）
+- `--check` 会自动校验，差异少于两个会报警
+- 群演可以用同一个模板重复，不需要全量定义
