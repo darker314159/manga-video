@@ -33,6 +33,32 @@ MIT 许可要求再分发时保留版权声明与许可文本：
 - ✅ `LICENSE` 原样保留，署名 Dylan Deng
 - ✅ 本文件明确标注原作者与上游地址
 - ✅ 未以本仓库名义宣称著作权
+- ✅ 本地修改（v1.1）在下方「修改说明」与 commit message 中如实标注
+
+## 修改说明 / Modification notes
+
+### v1.1 · 抖音爆款优化版（2026-11-02）
+
+由 `darker314159` 在原作者基础上定制，**8 个文件变更（+1558 / −240）**：
+
+| 文件 | 类型 | 改动 |
+|---|---|---|
+| `SKILL.md` | 修改 | 重构为「六大优化模块」结构；**移除了对 whiteboard/riso 等 21 种不存在风格的引用**；新增微信气泡、豆包 TTS、部署、抖音标题章节 |
+| `styles/CHARACTERS.md` | 修改 | 角色规范扩充（+316 行）：女性精修、男性立体五官、36 种表情 |
+| `scripts/doubao-tts.py` | 新增 | 火山引擎豆包 TTS 配音，密钥读 `DOUBAO_*` 环境变量 |
+| `scripts/water-koubo.py` | 新增 | 文案二创改写脚本 |
+| `scripts/deploy.mjs` | 新增 | Vercel / Netlify 自动部署，密钥读 `VERCEL_TOKEN` / `NETLIFY_AUTH_TOKEN` |
+| `scripts/pack-manga-video.mjs` | 新增 | 一键打包 |
+| `promo/runtime/wechat-bubble.js` | 新增 | 微信绿色气泡对话 UI |
+| `promo/runtime/wechat-patch.js` | 新增 | 气泡 UI 补丁层 |
+
+**未改动**：`LICENSE`、`core/`、`explainer/`、`promo/` 其余文件、`styles/manga/STYLE.md` 等 47 个上游文件。
+
+> **关于 `scripts/water-koubo.py`**：这是一个**本地规则引擎**（文件自述「本地 LLM-free 版本，基于模板与规则」），
+> 仅在 docstring 里致敬 water-koubo 的**理念**，代码与文案为独立实现。
+> 已做文本比对核验：脚本内 12 条长中文串与 water-koubo 原文 **完全重合 0 条**。
+> 因此**未内置** water-koubo（老肖AI运营，CC BY-NC 4.0）的指令内容，本仓库不涉及该 CC BY-NC 材料的再分发。
+> 若你另行安装了 water-koubo 本体，其使用仍须遵守该 CC BY-NC 4.0 条款。
 
 ## 第三方依赖与素材
 
@@ -63,8 +89,10 @@ lumen      map     mystery  newsreel pixel     riso     shadow     storybook
 swiss      tapestry trailer  whiteboard
 ```
 
-受影响文件：`explainer/GUIDE.md`（明确写 `../styles/whiteboard/STYLE.md`、`../styles/riso/STYLE.md`）、
-`promo/GUIDE.md`、`SKILL.md` 等。**AI 按文档去读这些文件会失败。**
+受影响文件：`explainer/GUIDE.md`、`promo/references/kit.md` 等。
+
+> **v1.1 进展**：`SKILL.md` 里的跨风格引用**已在 v1.1 全部移除**（`grep` 核验 0 处）。
+> 但 `explainer/GUIDE.md` 与 `promo/references/kit.md` **仍未修**，仍指向不存在的风格目录。
 
 ### 2. `agents/openai.yaml` 元数据陈旧
 
@@ -73,16 +101,19 @@ swiss      tapestry trailer  whiteboard
 
 ### 3. `SKILL.md` 含死引用
 
-开头写「若技能目录下存在 `scripts/unpack.py`，先执行 `python3 scripts/unpack.py`」，
+第 48 行仍写「若技能目录下存在 `scripts/unpack.py`，先执行 `python3 scripts/unpack.py`」，
 但本包内**既无 `scripts/unpack.py` 也无 `assets/runtime_bundle.json`**（已是解包版），该指示恒不成立。
+
+> 注意：v1.1 新增了一个 `scripts/` 目录（放 doubao-tts / deploy 等），但**仍未包含 `unpack.py`**，
+> 该引用依旧无效。实际存在性判断为真→假，不影响运行，但会误导 agent 多跑一步。
 
 ### 4. `references/source.md` 部分条目失效
 
 - 声称「风格：29 种」——本包只有 1 种
 - 提到 `explainer/runtime/katex/LICENSE` —— 本包内无该目录
 
-> 若需要，可后续提交一个「manga 单风格适配」补丁：修正上述元数据、把多风格引用改写为 `styles/manga/`、
-> 删除死引用。该补丁会构成对上游的修改，需按 MIT 要求在改动说明中标注。
+> 若需要，可后续提交一个「manga 单风格适配」补丁：修正上述元数据、把剩余多风格引用改写为 `styles/manga/`、
+> 删除死引用。该补丁会构成对上游的进一步修改，需按 MIT 要求在改动说明中标注。
 
 
 ## 免责声明
