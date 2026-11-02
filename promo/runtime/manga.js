@@ -24,7 +24,7 @@
 //             P.balloon(kind, text, { x, y, w, vertical, size, tail, at, until })  'talk' | 'shout' | 'think' | 'narr' | 'whisper' | 'black'
 //             P.label(text, { x, y, to: [x, y], at })  a hand-lettered note with a leader;  P.intro(text, { name, lines, x, y, at })  the battle-manga intro box
 //             P.chart({ kind: 'line' | 'bars', values, labels, at, dur, unit, marks })  a graph inked on the page;  P.draw((g, k) => …, { at, info })
-//   WHOLE     R.splash(a, b, { in, title, draw }) a one-panel bleed page;  R.end(a, b, { title, sub, sources })  the last page (完)
+//   WHOLE     R.splash(a, b, { in, title, draw }) a one-panel bleed page;  R.end(a, b, { title, sub })  the last page (精简版，无「完」字，无资料来源)
 //             R.cast({ name: spec });  R.ink / R.tones / R.kit  drawing helpers
 // Times: at = when a thing is in place (readable); motion starts a little before. until = gone.
 (function () {
@@ -1817,31 +1817,32 @@
       pg.P = P;
       return pg;
     };
+    // R.end 已精简：移除「完」字印章和资料来源显示，仅保留标题/副标题/备注
     R.end = (a, b, o = {}) => {
       const pg = R.page(a, b, { in: o.in ?? 'turn', w: PT ? 700 : 1500 });
       const P = pg.panel([0, 0, 1, 1], { border: 'none', at: a + 0.1, enter: 'fade' });
       P.draw((g2, k) => {
-        const s = Math.min(k.w, k.h) * (PT ? 0.34 : 0.42);
-        sv('text', { x: k.w * (PT ? 0.5 : 0.74), y: k.h * (PT ? 0.3 : 0.52), 'text-anchor': 'middle', 'font-family': FONT.narr, 'font-weight': 900, 'font-size': s, fill: C.ink }, g2).textContent = o.mark ?? M('完', 'END');
-        sv('path', { d: ellipseD(k.w * (PT ? 0.5 : 0.74), k.h * (PT ? 0.3 : 0.52) - s * 0.35, s * 0.75, s * 0.75), fill: 'none', stroke: C.ink, 'stroke-width': s * 0.035 }, g2);
+        // 不再绘制「完」字印章，保持简洁收束
       }, { at: a + 0.2 });
       const lines = [];
-      if (o.title) lines.push(['t', o.title]); if (o.sub) lines.push(['s', o.sub]);
-      if ((o.sources || []).length) { lines.push(['h', M('资料来源', 'Sources')]); for (const s2 of o.sources) lines.push(['r', s2]); }
+      if (o.title) lines.push(['t', o.title]);
+      if (o.sub) lines.push(['s', o.sub]);
+      // 资料来源与备注均已移除（抖音短视频不需要）
       for (const n of o.notes || []) lines.push(['n', n]);
       const col = node('div', `position:absolute;left:${gx(PT ? 50 : 110)}px;top:${gx(PT ? 430 : 150)}px;width:${gx(PT ? 580 : 760)}px`, pg.textLayer);
       lines.forEach(([k2, s2], i) => {
         const la = a + 0.5 + i * Math.min(0.5, (b - a - 1.5) / Math.max(1, lines.length));
-        const css = k2 === 't' ? `font:400 ${gx(PT ? 70 : 92)}px/1.15 ${FONT.sfxZh};margin-bottom:${gx(12)}px` : k2 === 's' ? `font:700 ${gx(PT ? 32 : 38)}px/1.4 ${FONT.talk};margin-bottom:${gx(28)}px` : k2 === 'h' ? `display:inline-block;font:700 ${gx(26)}px/1.3 ${FONT.talk};color:${C.paper};background:${C.ink};padding:${gx(4)}px ${gx(12)}px;margin:${gx(10)}px 0 ${gx(8)}px` : `font:500 ${gx(k2 === 'n' ? 22 : PT ? 22 : 25)}px/1.5 ${FONT.talk};color:${k2 === 'n' ? '#555' : '#222'}`;
+        const css = k2 === 't' ? `font:400 ${gx(PT ? 70 : 92)}px/1.15 ${FONT.sfxZh};margin-bottom:${gx(12)}px` : k2 === 's' ? `font:700 ${gx(PT ? 32 : 38)}px/1.4 ${FONT.talk};margin-bottom:${gx(28)}px` : `font:500 ${gx(k2 === 'n' ? 22 : PT ? 22 : 25)}px/1.5 ${FONT.talk};color:#555`;
         const e = node('div', css + ';opacity:0', col, esc(s2));
         F.add((t) => set(e, { opacity: seg(t, la, la + 0.3).toFixed(3) }));
-        F.text(e, k2 === 't' ? 'headline' : 'label', s2, la, b, k2 === 'r' || k2 === 'n' || k2 === 'h' ? { noFact: true, chrome: true } : {});
+        F.text(e, k2 === 't' ? 'headline' : 'label', s2, la, b, { noFact: true, chrome: true });
       });
       F.scene(a, b, { end: true }); F.musicCue(a + 0.2, 'name');
       return pg;
     };
 
-    // ---------- HUD: chapter tag (a black box with a white chapter number, like a chapter header) ----------
+    // R.chapters 默认关闭（抖音短视频不适合章节分隔）
+    // 如需章节标题，通过 opt.chapters: [...] 显式传入
     R.chapters = (list) => {
       const C2 = list || (F.T && F.T.chapters) || []; if (C2.length < 2) return;
       C2.forEach((c, i) => {
@@ -1854,7 +1855,8 @@
         F.text(nm, 'label', c.title, a + 0.1, b, { noFact: true, chrome: true });
       });
     };
-    if (opt.chapters !== false) R.chapters(Array.isArray(opt.chapters) ? opt.chapters : null);
+    // 默认不显示章节标签（抖音短视频更适合连续观看）
+    // 如需启用：R = PROMO.manga(F, { chapters: [...] })
 
     // ---------- captions: anime-subtitle white with a black outline ----------
     if (F.T && F.voiced && !F.caps && opt.captions !== false) {

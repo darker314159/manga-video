@@ -251,7 +251,21 @@ node scripts/deploy.mjs <project_dir>
 
 ---
 
-## 9. 标准制作与渲染工作流
+## 9. 精简优化说明（已移除的内容）
+
+为适配抖音爆款短视频的流畅节奏，以下传统漫画元素已被移除：
+
+| 已移除内容 | 说明 |
+|---|---|
+| 第一话 / 第二话 / 第三话 章节标签 | 短视频不宜分集，连续观看更友好 |
+| 结尾「完」字印章页面 | 抖音不需要漫画式收束，直接收尾更流畅 |
+| 资料来源 / 出处展示 | 用户更关注内容本身，来源影响沉浸感 |
+
+> 如需恢复某功能，可通过 `opt.chapters` 或 `R.end()` 参数手动传入。
+
+---
+
+## 10. 标准制作与渲染工作流
 
 1. **准备音频**（`audio/narration.m4a` + `timeline.json` + `timeline.js`）：
    - 若用户未提供音频：编写 `script.json` 并运行 `python3 scripts/doubao-tts.py <project_dir>`
@@ -264,5 +278,3 @@ node scripts/deploy.mjs <project_dir>
 4. **合成混音与渲染**：`node promo/scripts/render.mjs <project_dir> --audio --bgm "<bgm.mp3>" --bgm-volume 0.18`
 5. **部署 + 输出链接**：`node scripts/deploy.mjs <project_dir>`
 6. **输出抖音爆款标题**
-
-详细组件参数见 [styles/manga/STYLE.md](styles/manga/STYLE.md)。
